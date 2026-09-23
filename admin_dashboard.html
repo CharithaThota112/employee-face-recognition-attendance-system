@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin Dashboard - Employee Attendance System</title>
+  <style>
+    /* Reset */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1350&q=80') no-repeat center center fixed;
+      background-size: cover;
+      color: #333;
+      overflow: hidden; /* Prevent horizontal and vertical scroll on body */
+      display: flex;
+      flex-direction: column;
+    }
+
+    header, footer {
+      background-color: rgba(0, 43, 92, 0.85);
+      color: #f0f4f8;
+      padding: 15px 30px;
+      text-align: center;
+      font-weight: 600;
+      letter-spacing: 1.1px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      flex-shrink: 0;
+      user-select: none;
+      height: 60px;
+      line-height: 30px;
+    }
+
+    header {
+      font-size: 1.6rem;
+      letter-spacing: 1.3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    footer {
+      font-size: 0.9rem;
+      font-weight: 400;
+      letter-spacing: 0.8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 40px;
+    }
+
+    main {
+      flex-grow: 1;
+      background: rgba(255, 255, 255, 0.95);
+      max-width: 1100px;
+      width: 1100px; /* fixed width */
+      margin: 20px auto;
+      border-radius: 14px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+      padding: 30px 25px;
+      overflow-y: auto; /* vertical scroll if needed */
+      overflow-x: hidden;
+    }
+
+    h2 {
+      color: #002c5f;
+      margin-bottom: 20px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      font-size: 2rem;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .top-bar {
+      margin-bottom: 25px;
+      font-weight: 600;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 18px;
+      font-size: 1rem;
+      flex-wrap: nowrap; /* no wrapping */
+      white-space: nowrap; /* prevent breaking */
+    }
+
+    .top-bar a {
+      color: #007bff;
+      cursor: pointer;
+      user-select: none;
+      text-decoration: none;
+      transition: color 0.3s ease;
+      padding: 6px 10px;
+      border-radius: 6px;
+    }
+
+    .top-bar a:hover,
+    .top-bar a:focus {
+      color: #0056b3;
+      text-decoration: underline;
+      outline: none;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      margin-bottom: 40px;
+      table-layout: fixed; /* keep columns fixed */
+    }
+
+    th, td {
+      padding: 14px 20px;
+      border-bottom: 1px solid #dee2e6;
+      text-align: center;
+      font-weight: 500;
+      font-size: 1rem;
+      color: #444;
+      word-wrap: break-word;
+    }
+
+    th {
+      background-color: #007bff;
+      color: white;
+      text-transform: uppercase;
+      letter-spacing: 1.1px;
+      font-weight: 700;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f7faff;
+    }
+
+    tr:hover {
+      background-color: #e3f0ff;
+      transition: background-color 0.3s ease;
+    }
+
+    h3 {
+      text-align: center;
+      margin: 40px 0 20px;
+      color: #002c5f;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      font-size: 1.5rem;
+    }
+
+    .chart-container {
+      width: 100%;
+      max-width: 1000px;
+      margin: 0 auto 50px;
+      overflow-x: auto;
+    }
+
+    canvas {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+      max-height: 400px;
+      width: 100% !important;
+      height: auto !important;
+    }
+
+    /* Scrollbar styling for main */
+    main::-webkit-scrollbar {
+      width: 12px;
+    }
+    main::-webkit-scrollbar-thumb {
+      background-color: rgba(0,43,92,0.5);
+      border-radius: 6px;
+    }
+    main::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 6px;
+    }
+
+    /* Flash message styling */
+    #flash-message {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #28a745;
+      color: white;
+      padding: 15px 25px;
+      border-radius: 5px;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      z-index: 9999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+    }
+    #flash-message.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Responsive fallback */
+    @media (max-width: 1120px) {
+      main {
+        width: 95%;
+        max-width: none;
+        margin: 20px auto;
+      }
+      .top-bar {
+        flex-wrap: wrap;
+        gap: 12px;
+        white-space: normal;
+      }
+    }
+
+    @media (max-width: 600px) {
+      h2 {
+        font-size: 1.5rem;
+      }
+      h3 {
+        font-size: 1.2rem;
+      }
+      th, td {
+        font-size: 0.85rem;
+        padding: 10px 8px;
+      }
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <header>
+    Employee Face Recognition Check-In and Check-Out Logging System - Admin Dashboard
+  </header>
+
+  <main>
+    <h2>Admin Dashboard</h2>
+
+    <nav class="top-bar" aria-label="Primary navigation">
+      <a href="{{ url_for('register') }}" tabindex="0">Register New User</a>
+      <a href="{{ url_for('train_model_route') }}" tabindex="0">Train Model</a>
+      <a href="{{ url_for('hr_dashboard') }}" tabindex="0">View Attendance Logs (HR)</a>
+      <a href="{{ url_for('logout') }}" tabindex="0">Logout</a>
+    </nav>
+
+    <section aria-labelledby="users-heading">
+      <h3 id="users-heading">Registered Users</h3>
+      <table role="table" aria-describedby="users-heading">
+        <thead>
+          <tr>
+            <th scope="col" style="width: 10%;">UserID</th>
+            <th scope="col" style="width: 30%;">Username</th>
+            <th scope="col" style="width: 30%;">Password</th>
+            <th scope="col" style="width: 30%;">Role</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in users %}
+          <tr>
+            <td>{{ user[0] }}</td>
+            <td>{{ user[1] }}</td>
+            <td>{{ user[2] }}</td>
+            <td>{{ user[3] }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+
+    <section aria-labelledby="charts-heading">
+      <h3 id="charts-heading">Attendance Summary Charts</h3>
+      <div class="chart-container" role="region" aria-live="polite" aria-label="Attendance charts">
+        <canvas id="adminUserChart" aria-describedby="charts-heading"></canvas>
+        <canvas id="adminDateChart" aria-describedby="charts-heading"></canvas>
+      </div>
+    </section>
+  </main>
+
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <div id="flash-message" role="alert" aria-live="assertive" aria-atomic="true">
+        {% for msg in messages %}
+          {{ msg }}
+        {% endfor %}
+      </div>
+      <script>
+        window.addEventListener('load', function() {
+          const flash = document.getElementById('flash-message');
+          flash.classList.add('show');
+          setTimeout(() => {
+            flash.classList.remove('show');
+          }, 4000);  // visible for 4 seconds
+        });
+      </script>
+    {% endif %}
+  {% endwith %}
+
+  <footer>
+    &copy; Employee Face Recognition Check-In and Check-Out Logging System .
+  </footer>
+
+  <script>
+    const users = {{ users_json | safe }};
+    const userData = {{ user_data_json | safe }};
+    const dates = {{ dates_json | safe }};
+    const dateData = {{ date_data_json | safe }};
+
+    // Bar chart: attendance count per user
+    new Chart(document.getElementById('adminUserChart').getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels: users,
+        datasets: [{
+          label: 'Attendance Count',
+          data: userData,
+          backgroundColor: 'rgba(75, 192, 192, 0.7)',
+          borderColor: 'rgba(75, 192, 192, 1)',
+          borderWidth: 1,
+          borderRadius: 5
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: { y: { beginAtZero: true } },
+        plugins: { legend: { display: false } }
+      }
+    });
+
+    // Line chart: attendance count per date
+    new Chart(document.getElementById('adminDateChart').getContext('2d'), {
+      type: 'line',
+      data: {
+        labels: dates,
+        datasets: [{
+          label: 'Attendance Records per Day',
+          data: dateData,
+          fill: false,
+          borderColor: 'rgba(255, 159, 64, 1)',
+          backgroundColor: 'rgba(255, 159, 64, 0.5)',
+          tension: 0.3,
+          pointRadius: 5,
+          pointHoverRadius: 7
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+  </script>
+</body>
+</html>
